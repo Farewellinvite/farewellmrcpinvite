@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>MRCP Memory Vault 2026</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    background:#070b16;
+    overflow:hidden;
+    font-family:Arial, sans-serif;
+    color:white;
+}
+
+/* PARTICLES */
+
+body::before{
+    content:"";
+    position:fixed;
+    width:200%;
+    height:200%;
+    background:
+    radial-gradient(circle,rgba(255,255,255,0.08) 1px,transparent 1px);
+    background-size:40px 40px;
+    animation:moveParticles 25s linear infinite;
+    opacity:0.3;
+}
+
+@keyframes moveParticles{
+
+from{
+transform:translate(0,0);
+}
+
+to{
+transform:translate(-200px,-200px);
+}
+
+}
+
+/* SCREEN */
+
+.screen{
+    position:absolute;
+    width:100%;
+    height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+    opacity:0;
+    visibility:hidden;
+    transition:1s;
+    padding:20px;
+}
+
+.active{
+    opacity:1;
+    visibility:visible;
+}
+
+/* INTRO */
+
+#intro{
+    background:black;
+    font-family:monospace;
+}
+
+.typing{
+    font-size:22px;
+    color:#00ff9d;
+    margin:10px;
+    overflow:hidden;
+    white-space:nowrap;
+    border-right:2px solid #00ff9d;
+    width:0;
+    animation:typing 3s steps(40,end) forwards;
+}
+
+.typing:nth-child(2){
+    animation-delay:2s;
+}
+
+.typing:nth-child(3){
+    animation-delay:4s;
+}
+
+@keyframes typing{
+
+to{
+width:100%;
+}
+
+}
+
+.enterBtn{
+    margin-top:40px;
+    padding:12px 25px;
+    border:none;
+    background:#00c853;
+    color:white;
+    border-radius:10px;
+    font-size:18px;
+    cursor:pointer;
+    opacity:0;
+    animation:showBtn 1s forwards;
+    animation-delay:6s;
+}
+
+@keyframes showBtn{
+
+to{
+opacity:1;
+}
+
+}
+
+/* MEMORY CARD */
+
+.memoryCard{
+    position:relative;
+    width:90%;
+    max-width:900px;
+    height:500px;
+    overflow:hidden;
+    border-radius:25px;
+    box-shadow:0 0 40px rgba(0,0,0,0.5);
+}
+
+.memoryCard img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    filter:blur(10px) brightness(0.5);
+    transition:1.2s;
+}
+
+.memoryCard.unlocked img{
+    filter:blur(0) brightness(1);
+    transform:scale(1.03);
+}
+
+/* OVERLAY */
+
+.overlay{
+    position:absolute;
+    inset:0;
+    background:linear-gradient(to top,
+    rgba(0,0,0,0.85),
+    rgba(0,0,0,0.1));
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-end;
+    padding:40px;
+}
+
+/* TEXTS */
+
+.chapter{
+    font-size:18px;
+    color:#a0cfff;
+    margin-bottom:10px;
+    letter-spacing:2px;
+    transition:0.8s;
+}
+
+.quote{
+    font-size:38px;
+    font-weight:bold;
+    max-width:700px;
+    line-height:1.3;
+    transition:0.8s;
+}
+
+/* QUESTION BOX */
+
+.questionBox{
+    margin-top:20px;
+    background:rgba(255,255,255,0.08);
+    backdrop-filter:blur(10px);
+    padding:18px;
+    border-radius:15px;
+    max-width:500px;
+    transition:0.8s;
+}
+
+.warning{
+    color:#ff4d88;
+    font-size:12px;
+    font-weight:bold;
+    margin-bottom:10px;
+    letter-spacing:1px;
+}
+
+.tease{
+    color:#d0d0d0;
+    font-style:italic;
+    margin-bottom:15px;
+    font-size:14px;
+}
+
+.question{
+    font-size:20px;
+    margin-bottom:15px;
+    line-height:1.5;
+}
+
+.options button{
+    border:none;
+    padding:10px 16px;
+    margin:5px;
+    border-radius:10px;
+    cursor:pointer;
+    background:white;
+    color:black;
+    font-weight:bold;
+    transition:0.3s;
+}
+
+.options button:hover{
+    transform:scale(1.05);
+}
+
+/* HIDE QUESTIONS AFTER UNLOCK */
+
+.memoryCard.unlocked .questionBox{
+    opacity:0;
+    visibility:hidden;
+    transform:translateY(-20px);
+}
+
+.memoryCard.unlocked .chapter{
+    opacity:0;
+}
+
+.memoryCard.unlocked .quote{
+    opacity:0;
+}
+
+/* MEMORY TEXT */
+
+.memoryText{
+    margin-top:20px;
+    font-size:20px;
+    color:#f0f0f0;
+    max-width:650px;
+    opacity:0;
+    transform:translateY(30px);
+    transition:1s;
+}
+
+.memoryCard.unlocked .memoryText{
+    opacity:1;
+    transform:translateY(0);
+}
+
+/* NEXT BUTTON */
+
+.nextBtn{
+    margin-top:25px;
+    padding:12px 24px;
+    border:none;
+    background:#00c853;
+    color:white;
+    border-radius:12px;
+    font-size:17px;
+    cursor:pointer;
+    display:none;
+}
+
+/* FINAL */
+
+.finalText{
+    text-align:center;
+    max-width:850px;
+    line-height:2;
+    font-size:24px;
+}
+
+.inviteBox{
+    background:rgba(255,255,255,0.08);
+    backdrop-filter:blur(15px);
+    padding:40px;
+    border-radius:25px;
+    text-align:center;
+    width:90%;
+    max-width:550px;
+}
+
+.inviteBox h1{
+    margin-bottom:20px;
+}
+
+.inviteBox p{
+    margin:15px 0;
+    font-size:20px;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- INTRO -->
+
+<div id="intro" class="screen active">
+
+<div class="typing">
+Initializing Memory Archive...
+</div>
+
+<div class="typing">
+Loading MRCP Batch 2022-26...
+</div>
+
+<div class="typing">
+Recovering Memories...
+</div>
+
+<button class="enterBtn" onclick="startJourney()">
+ENTER MEMORY VAULT
+</button>
+
+</div>
+
+<!-- MEMORY 1 -->
+
+<div id="s1" class="screen">
+
+<div class="memoryCard" id="card1">
+
+<img src="Image 1.jpg">
+
+<div class="overlay">
+
+<div class="chapter">
+CHAPTER 01 • THE BEGINNING
+</div>
+
+<div class="quote">
+“We came here as strangers.”
+</div>
+
+<div class="questionBox">
+
+<div class="tease">
+😏 “Dear seniors, enno memories untayi ga..andulo konni unlock cheddam?..ela antara?
+HEE....Answer cheyali andi...”
+</div>
+
+<div class="question">
+Where did the friendships begin?
+</div>
+
+<div class="options">
+
+<button onclick="showWrong('📚 Chaduvu biddalu sirr 😭')">
+Library
+</button>
+
+<button onclick="checkAnswer(1,true)">
+Classroom
+</button>
+
+<button onclick="showWrong('😏 Chaduvukovali First')">
+Canteen
+</button>
+
+</div>
+
+</div>
+
+<div class="memoryText">
+The classrooms once felt unfamiliar...
+but slowly became a second home filled with laughter, fear and unforgettable friendships.
+</div>
+
+<button class="nextBtn" id="n1" onclick="next(2)">
+Next Memory →
+</button>
+
+</div>
+</div>
+</div>
+
+<!-- MEMORY 2 -->
+
+<div id="s2" class="screen">
+
+<div class="memoryCard" id="card2">
+
+<img src="Image 2.jpg">
+
+<div class="overlay">
+
+<div class="chapter">
+CHAPTER 02 • THE CHAOS
+</div>
+
+<div class="quote">
+“Somewhere between photos and laughter.. A family was build.”
+</div>
+
+<div class="questionBox">
+
+<div class="tease">
+😂 “Unlocking this may cause sudden nostalgia attacks...”
+</div>
+
+<div class="question">
+What saved you during stressful days?
+</div>
+
+<div class="options">
+
+<button onclick="showWrong('😂 You sure Bhavani?')">
+Completed Works
+</button>
+
+<button onclick="checkAnswer(2,true)">
+Fests and Friends
+</button>
+
+<button onclick="showWrong('💀 Ide pedda stress')">
+Attendance
+</button>
+
+</div>
+
+</div>
+
+<div class="memoryText">
+Fest days, chaos, random photos and nonstop laughter...
+Marchipoleni memories kada!!.
+</div>
+
+<button class="nextBtn" id="n2" onclick="next(3)">
+Next Memory →
+</button>
+
+</div>
+</div>
+</div>
+
+<!-- MEMORY 3 -->
+
+<div id="s3" class="screen">
+
+<div class="memoryCard" id="card3">
+
+<img src="Image 3.jpg">
+
+<div class="overlay">
+
+<div class="chapter">
+CHAPTER 03 • THE GROWTH
+</div>
+
+<div class="quote">
+"Days Changed more than realization.”
+</div>
+
+<div class="questionBox">
+
+<div class="tease">
+😌 “Enni internals raasaro kada? Chepandi...”
+</div>
+
+<div class="question">
+What taught patience the most?
+</div>
+
+<div class="options">
+
+<button onclick="showWrong('😂 Holidays ah? Lucky fellow')">
+Vacations
+</button>
+
+<button onclick="checkAnswer(3,true)">
+Assignments & Exams
+</button>
+
+<button onclick="showWrong('😏 Akkada timepass eh')">
+Canteen
+</button>
+
+</div>
+
+</div>
+
+<div class="memoryText">
+Between practicals, exams and pressure...
+You slowly became the stronger versions of yourselves.
+</div>
+
+<button class="nextBtn" id="n3" onclick="next(4)">
+Next Memory →
+</button>
+
+</div>
+</div>
+</div>
+
+<!-- MEMORY 4 -->
+
+<div id="s4" class="screen">
+
+<div class="memoryCard" id="card4">
+
+<img src="Image 4.jpg">
+
+<div class="overlay">
+
+<div class="chapter">
+CHAPTER 04 • THE JOURNEY
+</div>
+
+<div class="quote">
+“We survived every deadline together.”
+</div>
+
+<div class="questionBox">
+
+<div class="tease">
+😅 “Only true lab survivors may continue...”
+</div>
+
+<div class="question">
+Who made practicals less stressful?
+</div>
+
+<div class="options">
+
+<button onclick="showWrong('🤨 Cheater found')">
+Google
+</button>
+
+<button onclick="checkAnswer(4,true)">
+Friends
+</button>
+
+<button onclick="showWrong('😅 U sure??')">
+Records
+</button>
+
+</div>
+
+</div>
+
+<div class="memoryText">
+The white coats carried more than responsibilities...
+they carried friendships, pressure and unforgettable teamwork...and now are carrying the words that would become the helping hands in stromy nights
+</div>
+
+<button class="nextBtn" id="n4" onclick="next(5)">
+Next Memory →
+</button>
+
+</div>
+</div>
+</div>
+
+<!-- MEMORY 5 -->
+
+<div id="s5" class="screen">
+
+<div class="memoryCard" id="card5">
+
+<img src="Image 5.jpg">
+
+<div class="overlay">
+
+<div class="chapter">
+CHAPTER 05 • THE LAST PAGE
+</div>
+
+<div class="quote">
+“Nothing prepares you for the final goodbye.”
+</div>
+
+<div class="questionBox">
+
+<div class="warning">
+⚠️ FINAL MEMORY CORE
+</div>
+
+<div class="tease">
+💙 “Last unlock before reality hits...”
+</div>
+
+<div class="question">
+What truly defines our college life?
+</div>
+
+<div class="options">
+
+<button onclick="showWrong('😂 Really?')">
+Attendance
+</button>
+
+<button onclick="checkAnswer(5,true)">
+Memories
+</button>
+
+<button onclick="showWrong('💀 It’s a nightmare')">
+Assignments
+</button>
+
+</div>
+
+</div>
+
+<div class="memoryText">
+One day you all walked into college without knowing each other...
+today you all are leave carrying pieces of each other forever.
+</div>
+
+<button class="nextBtn" id="n5" onclick="showFinal()">
+Finish Journey →
+</button>
+
+</div>
+</div>
+</div>
+
+<!-- FINAL -->
+
+<div id="final" class="screen">
+
+<div class="finalText">
+
+You all entered this place with uncertainty...But somewhere between classrooms,
+corridors, practical labs and random conversations...
+<br><br>
+
+You found friendships,
+memories,
+and a version of yourselves you never expected.
+<br><br>
+💙
+<br><br>
+
+College may end...
+but these moments never will, cause this isn't THE END it's just a
+
+<br><br>
+<b>;</b>
+<br><br>
+
+<button class="nextBtn"
+style="display:inline-block"
+onclick="showInvite()">
+
+Open Farewell Invitation
+
+</button>
+
+</div>
+
+</div>
+
+<!-- INVITATION -->
+
+<div id="invite" class="screen">
+
+<div class="inviteBox">
+
+<h1>🎓 FAREWELL 2026</h1>
+
+<p><b>Vizianagar Conventions</b></p>
+
+<p>📅 14th May 2026</p>
+
+<br>
+
+<p>
+“Some memories don’t end...
+they simply become stories.”
+</p>
+
+</div>
+
+</div>
+
+<script>
+
+/* START */
+
+function startJourney(){
+
+document.getElementById("intro")
+.classList.remove("active");
+
+document.getElementById("s1")
+.classList.add("active");
+
+}
+
+/* WRONG ANSWERS */
+
+function showWrong(message){
+
+alert(message);
+
+}
+
+/* CORRECT ANSWERS */
+
+function checkAnswer(i,correct){
+
+if(!correct){
+return;
+}
+
+document.getElementById("card"+i)
+.classList.add("unlocked");
+
+document.getElementById("n"+i)
+.style.display="inline-block";
+
+}
+
+/* NEXT */
+
+function next(i){
+
+document.querySelector(".active")
+.classList.remove("active");
+
+document.getElementById("s"+i)
+.classList.add("active");
+
+}
+
+/* FINAL */
+
+function showFinal(){
+
+document.querySelector(".active")
+.classList.remove("active");
+
+document.getElementById("final")
+.classList.add("active");
+
+}
+
+/* INVITE */
+
+function showInvite(){
+
+document.querySelector(".active")
+.classList.remove("active");
+
+document.getElementById("invite")
+.classList.add("active");
+
+}
+
+</script>
+
+</body>
+</html>
